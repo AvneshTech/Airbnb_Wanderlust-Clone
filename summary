@@ -1,0 +1,36 @@
+// in app.js --
+// create route
+app.post("/listings",wrapAsync( async (req,res,next) => {
+    // let {title,description,price,location,country} = req.body;
+    // let listing = {title,description,price,location,country};
+    // let newListing = new Listing(listing);
+//or
+
+    if(!req.body.listing){
+        throw new ExpressError(400,"Send valid data for listings");
+    }
+    let newListing = new Listing(req.body.listing);
+    
+    if(!newListing.title){
+        throw new ExpressError(400,"title is missing");
+    }
+
+    if(!newListing.description){
+        throw new ExpressError(400,"descr is missing");
+    }
+
+    if(!newListing.location){
+        throw new ExpressError(400,"location is missing");
+    }
+
+    await newListing.save();
+    res.redirect("/listings");
+
+    //badd m simply ye klikenge
+    const result = listingSchema.validate(req.body);
+    console.log(result);
+    if(result.error){
+        throw new ExpressError(400,result.error);
+    }
+}));
+,
