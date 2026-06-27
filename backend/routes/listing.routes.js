@@ -1,9 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const multer = require("multer");
-const { storage } = require("../config/cloudinary.config.js");
-const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
+const { upload } = require("../config/cloudinary.config.js");
 const catchAsync = require("../utils/catchAsync.js");
 const validateObjectId = require("../middleware/validateObjectId.middleware.js");
 const { isLoggedIn, isOwner } = require("../middleware/auth.middleware.js");

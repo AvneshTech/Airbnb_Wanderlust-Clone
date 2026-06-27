@@ -1,5 +1,6 @@
 const Listing = require("../models/listing.model.js");
 const ExpressError = require("../utils/ExpressError.js");
+const { uploadImage } = require("../config/cloudinary.config.js");
 
 // GET /api/listings  ->  supports ?category= and ?query= (combined search route).
 module.exports.index = async (req, res) => {
@@ -35,14 +36,16 @@ module.exports.showListing = async (req, res) => {
 
 // POST /api/listings  (auth + image upload)
 module.exports.createListing = async (req, res) => {
-  // Bug #1 fix: verify a file was actually uploaded before touching req.file.path.
+  // Bug #1 fix: verify a file was actually uploaded before using it.
   if (!req.file) {
     throw new ExpressError(400, "Image is required");
   }
 
+  const image = await uploadImage(req.file);
+
   const newListing = new Listing(req.body);
   newListing.owner = req.user._id;
-  newListing.image = { url: req.file.path, filename: req.file.filename };
+  newListing.image = image;
   await newListing.save();
 
   res.status(201).json({ message: "New listing created", listing: newListing });
@@ -62,7 +65,7 @@ module.exports.updateListing = async (req, res) => {
   }
 
   if (req.file) {
-    listing.image = { url: req.file.path, filename: req.file.filename };
+    listing.image = await uploadImage(req.file);
     await listing.save();
   }
 
