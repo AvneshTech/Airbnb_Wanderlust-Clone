@@ -416,7 +416,7 @@ GitHub: https://github.com/AvneshTech
 
 LinkedIn: https://linkedin.com/in/your-linkedin
 
-Email: your-email@example.com
+Email: avneshbaghel.30july@gmailcom
 
 ---
 
