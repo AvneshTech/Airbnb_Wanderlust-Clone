@@ -5,6 +5,8 @@ const MongoStore = require("connect-mongo");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const cors = require("cors");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
 
 const User = require("./models/user.model.js");
 const { notFound, errorHandler } = require("./middleware/error.middleware.js");
@@ -17,9 +19,24 @@ const aiRoutes = require("./routes/ai.routes.js");
 
 const app = express();
 
+// Security headers - helmet sets X-Frame-Options, X-Content-Type-Options,
+// Strict-Transport-Security, and many others with safe defaults.
+// contentSecurityPolicy is relaxed slightly so the Vite dev-server and
+// Cloudinary image URLs work without extra configuration.
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // configured per-deployment at the CDN/proxy layer
+    crossOriginEmbedderPolicy: false, // allows Cloudinary image embeds
+  })
+);
+
 // Body parsers (express built-ins replace body-parser; bug #11).
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Strip MongoDB operator keys (e.g. "$gt", "$ne") from req.body, req.query
+// and req.params to prevent NoSQL injection attacks.
+app.use(mongoSanitize());
 
 // CORS actually configured this time, with credentials + an explicit origin (bug #11).
 app.use(
