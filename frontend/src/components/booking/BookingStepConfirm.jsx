@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function BookingStepConfirm({ onBack, onConfirm, submitting, done }) {
   if (done) {
     return (
@@ -5,7 +7,7 @@ export default function BookingStepConfirm({ onBack, onConfirm, submitting, done
         <i className="fa-solid fa-circle-check text-success" style={{ fontSize: "3rem" }}></i>
         <h5 className="mt-3">Booking confirmed!</h5>
         <p className="text-muted">Your stay is booked. View it under "My bookings".</p>
-        <a href="/bookings/my" className="btn add-btn text-white mt-2">Go to my bookings</a>
+        <Link to="/bookings/my" className="btn add-btn text-white mt-2">Go to my bookings</Link>
       </div>
     );
   }

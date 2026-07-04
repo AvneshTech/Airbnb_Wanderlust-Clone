@@ -25,7 +25,10 @@ module.exports.index = async (req, res) => {
 module.exports.showListing = async (req, res) => {
   const { id } = req.params;
   const listing = await Listing.findById(id)
-    .populate({ path: "reviews", populate: { path: "author", select: "username" } })
+    .populate({
+      path: "reviews",
+      populate: { path: "author", select: "username" },
+    })
     .populate("owner", "username");
 
   if (!listing) {
@@ -42,11 +45,30 @@ module.exports.createListing = async (req, res) => {
   }
 
   const image = await uploadImage(req.file);
+  //   module.exports.createListing = async (req, res) => {
+  //     console.log(req.file);
+
+  //     const newListing = new Listing(req.body);
+
+  //     newListing.owner = req.user._id;
+
+  //     newListing.image = {
+  //         url: "https://dummyimage.com/600x400",
+  //         filename: "dummy"
+  //     };
+
+  //     await newListing.save();
+
+  //     res.json(newListing);
+  // };
 
   const newListing = new Listing(req.body);
   newListing.owner = req.user._id;
-  newListing.image = image;
-  await newListing.save();
+  // console.log("USER:", req.user);
+  // console.log("BODY:", req.body);
+  // console.log("FILE:", req.file);
+  // newListing.image = image;
+  // await newListing.save();
 
   res.status(201).json({ message: "New listing created", listing: newListing });
 };
@@ -57,7 +79,7 @@ module.exports.updateListing = async (req, res) => {
   const listing = await Listing.findByIdAndUpdate(
     id,
     { ...req.body },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   );
 
   if (!listing) {

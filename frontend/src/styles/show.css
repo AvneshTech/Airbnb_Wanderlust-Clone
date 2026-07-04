@@ -54,13 +54,6 @@
         margin: 0 auto !important;
     }
 
-    /* Rating stars */
-    .starability-slot,
-    .starability-result {
-        transform: scale(1.05);
-        margin-bottom: 10px;
-    }
-
     textarea {
         min-height: 120px;
         border-radius: 10px;

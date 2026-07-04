@@ -12,6 +12,13 @@ const CATEGORIES = [
 ];
 
 export default function CategoryFilterBar({ active, onSelect, showTax, onToggleTax }) {
+  const handleKeyDown = (key) => (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onSelect(active === key ? "" : key);
+    }
+  };
+
   return (
     <div id="filters" className="d-flex align-items-center">
       {CATEGORIES.map((c) => (
@@ -20,7 +27,10 @@ export default function CategoryFilterBar({ active, onSelect, showTax, onToggleT
           className="filter"
           style={{ opacity: active === c.key ? 1 : undefined }}
           onClick={() => onSelect(active === c.key ? "" : c.key)}
+          onKeyDown={handleKeyDown(c.key)}
           role="button"
+          tabIndex={0}
+          aria-pressed={active === c.key}
         >
           <div><i className={`fa-solid ${c.icon}`}></i></div>
           <p>{c.label}</p>

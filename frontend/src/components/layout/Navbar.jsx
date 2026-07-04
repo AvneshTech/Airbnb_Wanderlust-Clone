@@ -40,7 +40,7 @@ export default function Navbar() {
             <NavLink className="nav-link" to="/">Explore</NavLink>
             {currentUser && <NavLink className="nav-link" to="/listings/new">Add listing</NavLink>}
             {currentUser && <NavLink className="nav-link" to="/bookings/my">My bookings</NavLink>}
-            <NavLink className="nav-link" to="/chat">Chat</NavLink>
+            {currentUser && <NavLink className="nav-link" to="/chat">Chat</NavLink>}
           </div>
 
           <div className="mx-auto" style={{ flex: 1, maxWidth: 420 }}>

@@ -6,16 +6,18 @@ export default function ReviewForm({ onSubmit, submitting }) {
   const [comment, setComment] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!comment.trim()) {
       setError("Comment is required");
       return;
     }
     setError("");
-    onSubmit({ rating, comment });
-    setComment("");
-    setRating(3);
+    const ok = await onSubmit({ rating, comment });
+    if (ok) {
+      setComment("");
+      setRating(3);
+    }
   };
 
   return (

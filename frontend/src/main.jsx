@@ -5,7 +5,6 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./styles/style.css";
 import "./styles/filters.css";
 import "./styles/show.css";
-import "./styles/rating.css";
 import App from "./App.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { FlashProvider } from "./context/FlashContext.jsx";

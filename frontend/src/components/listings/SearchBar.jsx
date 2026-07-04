@@ -1,14 +1,19 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function SearchBar() {
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const q = query.trim();
-    navigate(q ? `/?query=${encodeURIComponent(q)}` : "/");
+    const params = new URLSearchParams(searchParams);
+    if (q) params.set("query", q);
+    else params.delete("query");
+    const qs = params.toString();
+    navigate(qs ? `/?${qs}` : "/");
   };
 
   return (

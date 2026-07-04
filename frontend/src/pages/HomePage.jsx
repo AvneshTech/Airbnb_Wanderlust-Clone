@@ -30,6 +30,7 @@ export default function HomePage() {
   const handleSelectCategory = (cat) => {
     const next = {};
     if (cat) next.category = cat;
+    if (query) next.query = query;
     setSearchParams(next);
   };
 

@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { fetchListing, deleteListing } from "../api/listingApi.js";
-import { createReview, deleteReview } from "../api/reviewApi.js";
+import { createReview, updateReview, deleteReview } from "../api/reviewApi.js";
 import { useAuth } from "../hooks/useAuth.js";
 import { useFlashMessage } from "../hooks/useFlashMessage.js";
 import Loader from "../components/common/Loader.jsx";
 import ReviewForm from "../components/reviews/ReviewForm.jsx";
 import ReviewCard from "../components/reviews/ReviewCard.jsx";
+
+const FALLBACK_IMAGE = "https://via.placeholder.com/800x400?text=No+image";
 
 function money(n) {
   if (n === null || n === undefined || Number.isNaN(Number(n))) return "Price unavailable";
@@ -56,10 +58,23 @@ export default function ListingDetailPage() {
       await createReview(id, data);
       addFlash("Review added", "success");
       load();
+      return true;
     } catch (err) {
       addFlash(err.response?.data?.message || "Could not add review", "error");
+      return false;
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleEditReview = async (reviewId, data) => {
+    try {
+      await updateReview(id, reviewId, data);
+      addFlash("Review updated", "success");
+      load();
+    } catch (err) {
+      addFlash(err.response?.data?.message || "Could not update review", "error");
+      throw err;
     }
   };
 
@@ -81,7 +96,15 @@ export default function ListingDetailPage() {
       <div className="row mt-3">
         <div className="col-md-8 offset-md-2 show-card">
           <h3 className="list-title">{listing.title}</h3>
-          <img className="show-img w-100 rounded my-3" src={listing.image?.url} alt={listing.title} />
+          <img
+            className="show-img w-100 rounded my-3"
+            src={listing.image?.url || FALLBACK_IMAGE}
+            alt={listing.title}
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = FALLBACK_IMAGE;
+            }}
+          />
           <div className="card-body px-0">
             <p>Owned by <b>{listing.owner?.username || "unknown"}</b></p>
             <p>{listing.description}</p>
@@ -91,7 +114,16 @@ export default function ListingDetailPage() {
           </div>
 
           <div className="btns my-3 d-flex gap-2">
-            <Link to={`/listings/${id}/book`} className="btn add-btn text-white">Book this stay</Link>
+            {!isOwner &&
+              (currentUser ? (
+                <Link to={`/listings/${id}/book`} className="btn add-btn text-white">
+                  Book this stay
+                </Link>
+              ) : (
+                <Link to="/login" state={{ from: { pathname: `/listings/${id}/book` } }} className="btn add-btn text-white">
+                  Log in to book
+                </Link>
+              ))}
             {isOwner && (
               <>
                 <Link to={`/listings/${id}/edit`} className="btn btn-dark edit-btn">Edit</Link>
@@ -116,7 +148,8 @@ export default function ListingDetailPage() {
                 <ReviewCard
                   key={r._id}
                   review={r}
-                  canDelete={currentUser && r.author && currentUser._id === (r.author._id || r.author)}
+                  canEdit={currentUser && r.author && currentUser._id === (r.author._id || r.author)}
+                  onEdit={handleEditReview}
                   onDelete={handleDeleteReview}
                 />
               ))

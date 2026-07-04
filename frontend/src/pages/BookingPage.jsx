@@ -21,6 +21,7 @@ export default function BookingPage() {
   const [details, setDetails] = useState({ checkInDate: "", checkOutDate: "", numberOfGuests: 1 });
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const [bookingId, setBookingId] = useState(null);
 
   useEffect(() => {
     fetchListing(id)
@@ -40,9 +41,16 @@ export default function BookingPage() {
   const handleConfirm = async () => {
     setSubmitting(true);
     try {
-      // Step 3: create then confirm.
-      const res = await createBooking({ listingId: id, ...details });
-      await confirmBooking(res.data.booking._id);
+      // Only create the booking once. If a previous attempt created it but the
+      // confirm step failed (e.g. a transient network blip), retrying skips
+      // createBooking entirely to avoid a duplicate pending booking in the DB.
+      let bId = bookingId;
+      if (!bId) {
+        const res = await createBooking({ listingId: id, ...details });
+        bId = res.data.booking._id;
+        setBookingId(bId);
+      }
+      await confirmBooking(bId);
       setDone(true);
       addFlash("Booking confirmed", "success");
     } catch (err) {
