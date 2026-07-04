@@ -1,6 +1,6 @@
 const Listing = require("../models/listing.model.js");
 const ExpressError = require("../utils/ExpressError.js");
-const { uploadImage } = require("../config/cloudinary.config.js");
+const { uploadImage, deleteImage } = require("../config/cloudinary.config.js");
 
 // GET /api/listings  ->  supports ?category= and ?query= (combined search route).
 module.exports.index = async (req, res) => {
@@ -45,30 +45,11 @@ module.exports.createListing = async (req, res) => {
   }
 
   const image = await uploadImage(req.file);
-  //   module.exports.createListing = async (req, res) => {
-  //     console.log(req.file);
-
-  //     const newListing = new Listing(req.body);
-
-  //     newListing.owner = req.user._id;
-
-  //     newListing.image = {
-  //         url: "https://dummyimage.com/600x400",
-  //         filename: "dummy"
-  //     };
-
-  //     await newListing.save();
-
-  //     res.json(newListing);
-  // };
 
   const newListing = new Listing(req.body);
   newListing.owner = req.user._id;
-  // console.log("USER:", req.user);
-  // console.log("BODY:", req.body);
-  // console.log("FILE:", req.file);
-  // newListing.image = image;
-  // await newListing.save();
+  newListing.image = image;
+  await newListing.save();
 
   res.status(201).json({ message: "New listing created", listing: newListing });
 };
@@ -87,8 +68,12 @@ module.exports.updateListing = async (req, res) => {
   }
 
   if (req.file) {
+    const oldFilename = listing.image?.filename;
     listing.image = await uploadImage(req.file);
     await listing.save();
+    // Clean up the replaced asset after the new one is safely saved, so a
+    // failed save never leaves the listing without a valid image reference.
+    if (oldFilename) deleteImage(oldFilename);
   }
 
   res.json({ message: "Listing updated", listing });
@@ -101,5 +86,8 @@ module.exports.deleteListing = async (req, res) => {
   if (!deleted) {
     throw new ExpressError(404, "Listing not found");
   }
+  // Best-effort cleanup; never let a Cloudinary hiccup turn a successful
+  // delete into a 500 for the user.
+  if (deleted.image?.filename) deleteImage(deleted.image.filename);
   res.json({ message: "Listing deleted" });
 };

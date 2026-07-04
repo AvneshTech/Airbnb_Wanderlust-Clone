@@ -23,7 +23,9 @@ const reviewSchema = Joi.object({
 
 const bookingSchema = Joi.object({
   listingId: Joi.string().required(),
-  checkInDate: Joi.date().required(),
+  checkInDate: Joi.date().min("now").required().messages({
+    "date.min": "checkInDate cannot be in the past",
+  }),
   checkOutDate: Joi.date().greater(Joi.ref("checkInDate")).required().messages({
     "date.greater": "checkOutDate must be after checkInDate",
   }),
