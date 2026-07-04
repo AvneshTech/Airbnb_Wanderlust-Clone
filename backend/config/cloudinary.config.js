@@ -17,7 +17,9 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: (req, file, cb) => {
     if (/^image\/(jpe?g|png)$/.test(file.mimetype)) return cb(null, true);
-    cb(new Error("Only JPG, JPEG and PNG images are allowed"));
+    const err = new Error("Only JPG, JPEG and PNG images are allowed");
+    err.statusCode = 400;
+    cb(err);
   },
 });
 
@@ -30,4 +32,14 @@ function uploadImage(file) {
     .then((res) => ({ url: res.secure_url, filename: res.public_id }));
 }
 
-module.exports = { cloudinary, upload, uploadImage };
+// Deletes a previously-uploaded Cloudinary asset by its public_id ("filename" on
+// our image sub-document). Failures are logged but never thrown: a stale Cloudinary
+// asset should never block the user's listing update/delete from succeeding.
+function deleteImage(publicId) {
+  if (!publicId) return Promise.resolve();
+  return cloudinary.uploader.destroy(publicId).catch((err) => {
+    console.error("Cloudinary delete failed for", publicId, err);
+  });
+}
+
+module.exports = { cloudinary, upload, uploadImage, deleteImage };

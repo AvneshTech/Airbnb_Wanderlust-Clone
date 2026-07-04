@@ -47,4 +47,9 @@ const bookingSchema = new Schema({
   },
 });
 
+// Index for "my bookings" queries (filtered by guest, sorted by newest first).
+bookingSchema.index({ guest: 1, createdAt: -1 });
+// Index for quickly finding all bookings for a given listing (e.g. overlap checks).
+bookingSchema.index({ listing: 1, checkInDate: 1, checkOutDate: 1 });
+
 module.exports = mongoose.model("Booking", bookingSchema);

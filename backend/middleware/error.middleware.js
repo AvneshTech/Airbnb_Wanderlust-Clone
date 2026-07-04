@@ -17,6 +17,16 @@ const errorHandler = (err, req, res, next) => {
     message = `Invalid ${err.path}: ${err.value}`;
   }
 
+  // Multer errors (file-size limit, wrong MIME type) are always client errors.
+  // MulterError carries a .code ("LIMIT_FILE_SIZE" etc.); the fileFilter path
+  // sets .statusCode = 400 directly on the Error it passes to cb().
+  if (err.name === "MulterError") {
+    statusCode = 400;
+    message = err.code === "LIMIT_FILE_SIZE"
+      ? "File is too large. Maximum size is 5 MB"
+      : err.message;
+  }
+
   if (statusCode >= 500) {
     console.error(err);
   }

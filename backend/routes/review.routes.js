@@ -16,6 +16,15 @@ router.post(
   catchAsync(ctrl.createReview)
 );
 
+router.put(
+  "/:reviewId",
+  validateObjectId("listingId", "reviewId"),
+  isLoggedIn,
+  isReviewAuthor,
+  validateReview,
+  catchAsync(ctrl.updateReview)
+);
+
 router.delete(
   "/:reviewId",
   validateObjectId("listingId", "reviewId"),

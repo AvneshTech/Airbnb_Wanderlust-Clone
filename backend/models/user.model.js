@@ -6,6 +6,9 @@ const userSchema = new Schema({
   email: {
     type: String,
     required: true,
+    unique: true,        // enforced at DB level, not just Joi
+    lowercase: true,     // normalise before storage so "A@B.com" and "a@b.com" collide
+    trim: true,
   },
   // passport-local-mongoose adds username, hash and salt fields automatically.
 });
