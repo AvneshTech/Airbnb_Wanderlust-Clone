@@ -323,19 +323,19 @@ npm run dev
 ```env
 PORT=8080
 
-ATLASDB_URL=
+ATLASDB_URL=i5b6aeo8t76tbaeritua
 
-SECRET=
+SECRET=re7vawffbtsfengsklDFyfb8r
 
 CLIENT_URL=http://localhost:5173
 
-CLOUD_NAME=
+CLOUD_NAME=kr7ryfwtb7y
 
-CLOUD_API_KEY=
+CLOUD_API_KEY=ncr475vwero8iwnrv
 
-CLOUD_API_SECRET=
+CLOUD_API_SECRET=7vb7e8r64yfy3rn
 
-OPENAI_API_KEY=
+OPENAI_API_KEY=12387236429nh8euf7b
 ```
 
 ---
